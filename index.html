@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Valentine</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="landing-page" class="screen active">
+        <div class="photo-container">
+            <img src="photo1.jpg" alt="Us" class="main-photo">
+        </div>
+        <h1>Will you be my Valentine?</h1>
+        <div class="buttons">
+            <button id="yes-btn">Yes!</button>
+            <button id="no-btn">No</button>
+        </div>
+    </div>
+
+    <div id="game-page" class="screen">
+        <h2>I knew you would say Yes! ❤️</h2>
+        <p>Before read my letter, let's catch some love!</p>
+        <p>Catch <strong>15 Hearts</strong> to win.</p>
+        <p>Score: <span id="score">0</span></p>
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="poem-page" class="screen">
+        <div class="photo-container">
+             <img src="photo2.jpg" alt="Us Again" class="main-photo fade-in-photo">
+        </div>
+        <div id="poem-container"></div>
+    </div>
+
+    <div id="final-page" class="screen">
+        <div class="photo-container">
+            <img src="photo3.jpg" alt="Love You" class="main-photo">
+        </div>
+        <h1>I love you, Baby! ❤️</h1>
+        <p>Happy Valentine's Day 2025</p>
+        <button onclick="location.reload()">Replay</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+</html>
