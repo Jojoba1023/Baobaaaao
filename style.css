@@ -106,17 +106,18 @@ canvas {
 }
 
 #poem-container {
-    max-width: 600px;
+    max-width: 500px; /* Keeps text in a nice column like a letter */
     margin: 0 auto;
     padding-bottom: 50px;
 }
 
 .poem-line {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #444;
-    margin: 10px 0;
-    opacity: 0; /* Hidden initially */
+    font-size: 1.6rem;       /* Much bigger text */
+    line-height: 2.2;        /* More space between lines */
+    color: #333;             /* Darker color for better contrast */
+    font-weight: bold;       /* Optional: Makes the letters thicker */
+    margin: 15px 0;          /* More space between paragraphs */
+    opacity: 0; 
     transform: translateY(20px);
     transition: opacity 1s ease, transform 1s ease;
 }
@@ -135,4 +136,72 @@ canvas {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+/* Buttons */
+.buttons {
+    position: relative;
+    height: 100px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center; /* Centers buttons vertically */
+    justify-content: center; /* Centers "Yes" button */
+    margin: 0 auto;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#yes-btn {
+    background-color: #ff4d4d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
+    z-index: 10;
+    position: relative; 
+    margin-right: 60px; /* Push the Yes button a bit to the left */
+}
+
+#no-btn {
+    background-color: #e0e0e0;
+    color: #333;
+    position: absolute; 
+    left: 65%; /* Force the No button to the right side initially */
+    top: 50%;
+    transform: translateY(-50%); /* Center it vertically */
+    z-index: 5;
+}
+
+/* Trust Page Styling */
+.floating-text {
+    font-size: 3rem;
+    color: #ff4d4d;
+    font-family: 'Pacifico', cursive;
+    text-shadow: 2px 2px 0px white;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+.stats-container {
+    display: flex;
+    gap: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+#lives {
+    letter-spacing: 5px; /* Spacing between hearts */
 }
