@@ -9,10 +9,12 @@
 </head>
 <body>
 
-    <img id="img-cat" src="cat.png" style="display:none;">
-    <img id="img-poop" src="poop.png" style="display:none;">
-    <img id="img-bucket" src="bucket.png" style="display:none;">
-    <img id="img-fire" src="fire.png" style="display:none;">
+    <div style="display:none;">
+        <img id="img-cat" src="cat.png">
+        <img id="img-poop" src="poop.png">
+        <img id="img-bucket" src="bucket.png">
+        <img id="img-fire" src="fire.png">
+    </div>
 
     <div id="landing-page" class="screen active">
         <div class="photo-container">
@@ -43,7 +45,7 @@
             <canvas id="gameCanvas"></canvas>
             
             <div id="game-over-screen" class="overlay hidden">
-                <h2>Bruh! You want kaboom meh! 🔥</h2>
+                <h2>Oh no! You caught fire! 🔥</h2>
                 <button onclick="restartGame()">Try Again</button>
             </div>
         </div>
@@ -51,7 +53,7 @@
 
     <div id="trust-page" class="screen">
         <div class="photo-container">
-            <img src="kiki.png" alt="KiKi" class="main-photo">
+            <img src="kiki.jpeg" alt="KiKi" class="main-photo">
         </div>
         <h1 class="floating-text">KiKi trusts you now! 🐾</h1>
         <button class="nav-btn" onclick="goToPoem()">Next</button>
