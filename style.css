@@ -1,10 +1,11 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Noto Serif TC', serif; /* Good for Traditional Chinese */
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    background-color: #ffe6e6;
-    overflow: hidden; /* Prevent scrolling during game */
+    font-family: 'Noto Serif TC', serif;
+    /* LIGHT PINK BACKGROUND FOR ALL PAGES */
+    background-color: #ffc0cb; 
+    background-image: linear-gradient(180deg, #ffc0cb 0%, #ffd1dc 100%);
+    overflow: hidden; 
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -22,186 +23,91 @@ body {
     top: 0;
     left: 0;
     justify-content: center;
-    transition: opacity 1s ease;
+    transition: opacity 0.5s ease;
 }
 
 .screen.active {
     display: flex;
 }
 
-/* Images */
-.photo-container {
-    margin-bottom: 20px;
+.hidden {
+    display: none !important;
 }
 
+/* Images */
+.photo-container { margin-bottom: 20px; }
 .main-photo {
-    width: 250px;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 5px solid #ff4d4d;
+    width: 250px; height: 250px; object-fit: cover;
+    border-radius: 50%; border: 5px solid #ff4d4d;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 /* Typography */
-h1 {
-    font-family: 'Pacifico', cursive;
-    color: #ff4d4d;
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-}
-
-h2 {
-    color: #ff4d4d;
-}
+h1 { font-family: 'Pacifico', cursive; color: #ff4d4d; font-size: 2.5rem; margin-bottom: 20px; }
+h2 { color: #ff4d4d; margin-bottom: 10px; }
+p { color: #555; font-size: 1.1rem; }
 
 /* Buttons */
 .buttons {
     position: relative;
-    height: 100px;
-    width: 100%;
-    max-width: 400px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+    height: 120px; width: 100%; max-width: 400px;
+    display: flex; align-items: center; justify-content: center;
 }
 
 button {
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 12px 30px; font-size: 1.2rem; border: none;
+    border-radius: 50px; cursor: pointer; transition: transform 0.2s;
+    background-color: #ff4d4d; color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-#yes-btn {
-    background-color: #ff4d4d;
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
-    z-index: 10;
+button:hover { transform: scale(1.05); }
+
+/* Navigation Buttons (Next/Replay) */
+.nav-btn {
+    margin-top: 20px;
+    background-color: #ff6b81;
 }
+
+#yes-btn { z-index: 10; position: relative; }
 
 #no-btn {
-    background-color: #e0e0e0;
-    color: #333;
-    position: absolute; /* Allows us to move it freely */
+    background-color: #fff; color: #333;
+    position: absolute; /* Allows movement */
+    transition: left 0.1s ease, top 0.1s ease; /* Smooth sliding */
 }
 
-/* Game Canvas */
+/* Game Canvas & Overlay */
 canvas {
-    background: #fff0f0;
-    border: 2px solid #ffcccc;
+    background: #fff0f0; border: 4px solid #ffcccc;
+    border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    cursor: none; /* Hide cursor inside game */
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    color: white;
 }
 
-/* Poem Styling */
-#poem-page {
-    overflow-y: auto; /* Allow scrolling for long poem */
-    padding: 20px;
-    justify-content: flex-start;
-    padding-top: 50px;
-}
-
-#poem-container {
-    max-width: 500px; /* Keeps text in a nice column like a letter */
-    margin: 0 auto;
-    padding-bottom: 50px;
-}
-
+/* Poem */
+#poem-page { overflow-y: auto; padding-top: 50px; display: block; }
+#poem-container { max-width: 500px; margin: 0 auto; padding-bottom: 30px; }
 .poem-line {
-    font-size: 1.6rem;       /* Much bigger text */
-    line-height: 2.2;        /* More space between lines */
-    color: #333;             /* Darker color for better contrast */
-    font-weight: bold;       /* Optional: Makes the letters thicker */
-    margin: 15px 0;          /* More space between paragraphs */
-    opacity: 0; 
-    transform: translateY(20px);
+    font-size: 1.5rem; line-height: 2.0; color: #444; margin: 10px 0;
+    opacity: 0; transform: translateY(20px);
     transition: opacity 1s ease, transform 1s ease;
 }
+.poem-line.visible { opacity: 1; transform: translateY(0); }
 
-.poem-line.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-#final-page h1 {
-    font-size: 3rem;
-    animation: heartbeat 1.5s infinite;
-}
-
-@keyframes heartbeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-/* Buttons */
-.buttons {
-    position: relative;
-    height: 100px;
-    width: 100%;
-    max-width: 400px;
-    display: flex;
-    align-items: center; /* Centers buttons vertically */
-    justify-content: center; /* Centers "Yes" button */
-    margin: 0 auto;
-}
-
-button {
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-#yes-btn {
-    background-color: #ff4d4d;
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
-    z-index: 10;
-    position: relative; 
-    margin-right: 60px; /* Push the Yes button a bit to the left */
-}
-
-#no-btn {
-    background-color: #e0e0e0;
-    color: #333;
-    position: absolute; 
-    left: 65%; /* Force the No button to the right side initially */
-    top: 50%;
-    transform: translateY(-50%); /* Center it vertically */
-    z-index: 5;
-}
-
-/* Trust Page Styling */
+/* Trust Text */
 .floating-text {
-    font-size: 3rem;
-    color: #ff4d4d;
-    font-family: 'Pacifico', cursive;
-    text-shadow: 2px 2px 0px white;
+    font-size: 2.5rem; text-shadow: 2px 2px 0px white;
     animation: float 3s ease-in-out infinite;
 }
-
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
-}
-
-.stats-container {
-    display: flex;
-    gap: 20px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #555;
-    margin-bottom: 10px;
-}
-
-#lives {
-    letter-spacing: 5px; /* Spacing between hearts */
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
 }

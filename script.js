@@ -1,164 +1,211 @@
-// --- SECTION 1: THE BUTTONS ---
-const noBtn = document.getElementById('no-btn');
-const yesBtn = document.getElementById('yes-btn');
+// --- PAGE ELEMENTS ---
 const landingPage = document.getElementById('landing-page');
+const reactionPage = document.getElementById('reaction-page');
 const gamePage = document.getElementById('game-page');
-const trustPage = document.getElementById('trust-page'); 
+const trustPage = document.getElementById('trust-page');
 const poemPage = document.getElementById('poem-page');
 const finalPage = document.getElementById('final-page');
 
-// Move the NO button
-noBtn.addEventListener('mouseover', () => {
-    const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-    const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
-    noBtn.style.position = 'absolute';
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
+const yesBtn = document.getElementById('yes-btn');
+const noBtn = document.getElementById('no-btn');
+
+// --- 1. NO BUTTON CHASE LOGIC ---
+// We track mouse position and move button if it gets too close
+document.addEventListener('mousemove', (e) => {
+    if (!landingPage.classList.contains('active')) return;
+
+    const btnRect = noBtn.getBoundingClientRect();
+    const btnCenterX = btnRect.left + btnRect.width / 2;
+    const btnCenterY = btnRect.top + btnRect.height / 2;
+
+    const dist = Math.hypot(e.clientX - btnCenterX, e.clientY - btnCenterY);
+
+    // If mouse is within 150px of the button
+    if (dist < 150) {
+        // Calculate angle to move away
+        const angle = Math.atan2(e.clientY - btnCenterY, e.clientX - btnCenterX);
+        
+        // Move opposite direction
+        let moveX = Math.cos(angle) * -20; // Move speed
+        let moveY = Math.sin(angle) * -20;
+
+        let newLeft = noBtn.offsetLeft + moveX;
+        let newTop = noBtn.offsetTop + moveY;
+
+        // Keep inside screen bounds
+        const maxX = window.innerWidth - btnRect.width;
+        const maxY = window.innerHeight - btnRect.height;
+
+        if (newLeft < 0) newLeft = 0;
+        if (newLeft > maxX) newLeft = maxX;
+        if (newTop < 0) newTop = 0;
+        if (newTop > maxY) newTop = maxY;
+
+        noBtn.style.left = `${newLeft}px`;
+        noBtn.style.top = `${newTop}px`;
+    }
 });
 
-// YES button growth
-let scale = 1;
-setInterval(() => {
-    scale += 0.005; 
-    if (scale < 2.5) yesBtn.style.transform = `scale(${scale})`;
-}, 100);
-
-// Transition to Game
 yesBtn.addEventListener('click', () => {
     landingPage.classList.remove('active');
-    gamePage.classList.add('active');
-    startGame();
+    reactionPage.classList.add('active');
 });
 
-// --- SECTION 2: THE CAT POOP GAME (HARD MODE) ---
+// --- NAVIGATION FUNCTIONS ---
+function goToGame() {
+    reactionPage.classList.remove('active');
+    gamePage.classList.add('active');
+    startGame();
+}
+
+function goToPoem() {
+    trustPage.classList.remove('active');
+    poemPage.classList.add('active');
+    startPoem();
+}
+
+function goToFinal() {
+    poemPage.classList.remove('active');
+    finalPage.classList.add('active');
+    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+}
+
+
+// --- 2. GAME LOGIC ---
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
-const livesEl = document.getElementById('lives');
+const gameOverScreen = document.getElementById('game-over-screen');
 
-// Load Images
+// Images
 const catImg = document.getElementById('img-cat');
 const poopImg = document.getElementById('img-poop');
+const bucketImg = document.getElementById('img-bucket');
+const fireImg = document.getElementById('img-fire');
 
 canvas.width = Math.min(window.innerWidth * 0.9, 400);
 canvas.height = 500;
 
-let score = 0;
-let lives = 3;
+// Game State
 let gameActive = false;
-let player = { x: canvas.width / 2, y: canvas.height - 70, width: 60, height: 60 };
-let items = [];
-let spawnRate = 600; // Faster spawning
+let score = 0;
 let animationId;
 let spawnTimeout;
 
-function movePlayer(e) {
+// Entities
+let bucket = { x: canvas.width / 2 - 30, y: canvas.height - 80, width: 60, height: 60 };
+let bossCat = { x: 0, y: 10, width: 70, height: 70, speed: 3, direction: 1 };
+let items = []; // Holds both poop and fire
+
+// Bucket Controls
+function moveBucket(e) {
     if (!gameActive) return;
     const rect = canvas.getBoundingClientRect();
     let clientX = e.clientX || e.touches[0].clientX;
-    player.x = clientX - rect.left - player.width / 2;
-    if (player.x < 0) player.x = 0;
-    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    bucket.x = clientX - rect.left - bucket.width / 2;
+    
+    // Bounds check
+    if (bucket.x < 0) bucket.x = 0;
+    if (bucket.x + bucket.width > canvas.width) bucket.x = canvas.width - bucket.width;
 }
-canvas.addEventListener('mousemove', movePlayer);
-canvas.addEventListener('touchmove', movePlayer);
+canvas.addEventListener('mousemove', moveBucket);
+canvas.addEventListener('touchmove', moveBucket);
 
 function startGame() {
-    // Reset Variables
     score = 0;
-    lives = 3;
     items = [];
     scoreEl.innerText = score;
-    updateLivesDisplay();
     gameActive = true;
+    gameOverScreen.classList.add('hidden'); // Hide Try Again screen
     
-    animateGame();
+    animate();
     spawnItem();
 }
 
-function updateLivesDisplay() {
-    let hearts = "";
-    for(let i=0; i<lives; i++) hearts += "❤️";
-    livesEl.innerText = hearts;
+function restartGame() {
+    startGame();
 }
 
 function spawnItem() {
     if (!gameActive) return;
+
+    // 20% Chance for FIRE, 80% Chance for POOP
+    const isFire = Math.random() < 0.2;
+
     items.push({
-        x: Math.random() * (canvas.width - 40),
-        y: -40,
-        // DIFFICULTY: Faster speed (4 to 8 speed)
-        speed: 4 + Math.random() * 4 
+        type: isFire ? 'fire' : 'poop',
+        x: bossCat.x + (bossCat.width / 4), // Drop from Cat's current position
+        y: bossCat.y + bossCat.height,
+        width: 40,
+        height: 40,
+        speed: 3 + Math.random() * 2 // Fall speed (Slower than before)
     });
-    spawnTimeout = setTimeout(spawnItem, spawnRate); 
+
+    // Spawn rate
+    spawnTimeout = setTimeout(spawnItem, 800);
 }
 
-function animateGame() {
+function animate() {
     if (!gameActive) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw Player
-    ctx.drawImage(catImg, player.x, player.y, player.width, player.height);
 
-    // Draw Items
+    // 1. Move & Draw Boss Cat
+    bossCat.x += bossCat.speed * bossCat.direction;
+    // Bounce Cat off walls
+    if (bossCat.x + bossCat.width > canvas.width || bossCat.x < 0) {
+        bossCat.direction *= -1;
+    }
+    ctx.drawImage(catImg, bossCat.x, bossCat.y, bossCat.width, bossCat.height);
+
+    // 2. Draw Bucket
+    ctx.drawImage(bucketImg, bucket.x, bucket.y, bucket.width, bucket.height);
+
+    // 3. Move & Draw Items
     for (let i = 0; i < items.length; i++) {
         let item = items[i];
         item.y += item.speed;
-        
-        ctx.drawImage(poopImg, item.x, item.y, 40, 40);
 
-        // CAUGHT (Collision)
+        let img = item.type === 'fire' ? fireImg : poopImg;
+        ctx.drawImage(img, item.x, item.y, item.width, item.height);
+
+        // Collision Check
         if (
-            item.x < player.x + player.width &&
-            item.x + 40 > player.x &&
-            item.y < player.y + player.height &&
-            item.y + 40 > player.y
+            item.x < bucket.x + bucket.width &&
+            item.x + item.width > bucket.x &&
+            item.y < bucket.y + bucket.height &&
+            item.y + item.height > bucket.y
         ) {
-            score++;
-            scoreEl.innerText = score;
-            items.splice(i, 1);
-            i--;
-            
-            // WIN CONDITION: 10 Poops
-            if (score >= 10) {
-                gameWin();
+            // CAUGHT ITEM
+            if (item.type === 'fire') {
+                gameOver();
                 return;
+            } else {
+                score++;
+                scoreEl.innerText = score;
+                items.splice(i, 1);
+                i--;
+                
+                if (score >= 15) {
+                    gameWin();
+                    return;
+                }
             }
-        }
-        // MISSED (Hit the floor)
+        } 
+        // Missed item (hit floor)
         else if (item.y > canvas.height) {
             items.splice(i, 1);
             i--;
-            lives--;
-            updateLivesDisplay();
-            
-            // LOSE CONDITION
-            if (lives <= 0) {
-                gameOver();
-                return;
-            }
         }
     }
-    animationId = requestAnimationFrame(animateGame);
+
+    animationId = requestAnimationFrame(animate);
 }
 
 function gameOver() {
     gameActive = false;
     clearTimeout(spawnTimeout);
     cancelAnimationFrame(animationId);
-    
-    // Draw "Try Again" text on canvas
-    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = "white";
-    ctx.font = "bold 30px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("KiKi is judging you...", canvas.width/2, canvas.height/2 - 20);
-    ctx.fillText("Try Again!", canvas.width/2, canvas.height/2 + 30);
-
-    // Restart after 2 seconds
-    setTimeout(startGame, 2000);
+    gameOverScreen.classList.remove('hidden'); // Show Try Again button
 }
 
 function gameWin() {
@@ -167,21 +214,16 @@ function gameWin() {
     cancelAnimationFrame(animationId);
     
     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-    
+
+    // Wait 1 second then go to Trust page
     setTimeout(() => {
         gamePage.classList.remove('active');
-        trustPage.classList.add('active'); 
-        
-        setTimeout(() => {
-            trustPage.classList.remove('active');
-            poemPage.classList.add('active');
-            startPoem();
-        }, 3000);
-        
+        trustPage.classList.add('active');
     }, 1000);
 }
 
-// --- SECTION 3: THE POEM ---
+
+// --- 3. POEM LOGIC ---
 const poemText = [
     "笑我那些爛笑話的樣子",
     "笑到彎腰 笑到流淚",
@@ -230,6 +272,9 @@ const poemText = [
 
 function startPoem() {
     const container = document.getElementById('poem-container');
+    const nextBtn = document.getElementById('poem-next-btn');
+    container.innerHTML = ""; // Clear previous if any
+    
     let delay = 0;
 
     poemText.forEach(line => {
@@ -243,12 +288,12 @@ function startPoem() {
             p.classList.add('visible');
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }, delay);
-        delay += 1200; 
+        delay += 1000; 
     });
 
+    // Show the Next Button after all lines are shown
     setTimeout(() => {
-        poemPage.classList.remove('active');
-        finalPage.classList.add('active');
-        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-    }, delay + 5000);
+        nextBtn.classList.remove('hidden');
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, delay + 500);
 }
