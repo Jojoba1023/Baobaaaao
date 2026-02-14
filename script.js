@@ -10,27 +10,23 @@ const poemNextBtn = document.getElementById('poem-next-btn');
 
 // --- 1. NAVIGATION FUNCTIONS ---
 
-// Called by the YES button
 function handleYes() {
     landingPage.classList.remove('active');
     reactionPage.classList.add('active');
 }
 
-// Called by the NEXT button on Reaction Page
 function goToGame() {
     reactionPage.classList.remove('active');
     gamePage.classList.add('active');
     startGame();
 }
 
-// Called by the NEXT button on Trust Page
 function goToPoem() {
     trustPage.classList.remove('active');
     poemPage.classList.add('active');
     startPoem();
 }
 
-// Called by the NEXT button on Poem Page
 function goToFinal() {
     poemPage.classList.remove('active');
     finalPage.classList.add('active');
@@ -38,11 +34,10 @@ function goToFinal() {
 }
 
 
-// --- 2. NO BUTTON CHASE LOGIC (FAST & BOUNDED) ---
+// --- 2. NO BUTTON CHASE LOGIC (NORMAL SPEED) ---
 let isNoBtnMoving = false;
 
 document.addEventListener('mousemove', (e) => {
-    // Only run if on the landing page
     if (!landingPage.classList.contains('active')) return;
 
     const btnRect = noBtn.getBoundingClientRect();
@@ -54,8 +49,8 @@ document.addEventListener('mousemove', (e) => {
 
     const dist = Math.hypot(mouseX - btnCenterX, mouseY - btnCenterY);
 
-    // TRIGGER DISTANCE: Starts running when mouse is 250px away
-    if (dist < 250) {
+    // REVERTED: Detection radius back to 100px (closer)
+    if (dist < 100) {
         
         if (!isNoBtnMoving) {
             noBtn.style.position = 'fixed';
@@ -66,8 +61,8 @@ document.addEventListener('mousemove', (e) => {
 
         const angle = Math.atan2(mouseY - btnCenterY, mouseX - btnCenterX);
         
-        // JUMP DISTANCE: 300px
-        const moveDistance = 300; 
+        // REVERTED: Speed back to 50px (smooth chase)
+        const moveDistance = 50; 
         
         let moveX = Math.cos(angle) * -moveDistance;
         let moveY = Math.sin(angle) * -moveDistance;
@@ -75,7 +70,7 @@ document.addEventListener('mousemove', (e) => {
         let newX = btnRect.left + moveX;
         let newY = btnRect.top + moveY;
 
-        // --- BOUNDARY CHECK (Keep on screen) ---
+        // Boundary Check
         newX = Math.max(10, Math.min(window.innerWidth - btnRect.width - 10, newX));
         newY = Math.max(10, Math.min(window.innerHeight - btnRect.height - 10, newY));
 
@@ -266,8 +261,6 @@ const poemText = [
     "我也心甘情願",
     "能看到妳傻笑的臉",
     "其實覺得已經樂透",
-
-
     " ",
     "Happy Valentine's Day! ❤️"
 ];
