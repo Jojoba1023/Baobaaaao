@@ -1,53 +1,48 @@
-// --- DOM ELEMENTS ---
+// --- PAGE ELEMENTS ---
 const landingPage = document.getElementById('landing-page');
 const reactionPage = document.getElementById('reaction-page');
 const gamePage = document.getElementById('game-page');
 const trustPage = document.getElementById('trust-page');
 const poemPage = document.getElementById('poem-page');
 const finalPage = document.getElementById('final-page');
-
-const yesBtn = document.getElementById('yes-btn');
 const noBtn = document.getElementById('no-btn');
-
-const toGameBtn = document.getElementById('to-game-btn');
-const toPoemBtn = document.getElementById('to-poem-btn');
 const poemNextBtn = document.getElementById('poem-next-btn');
 
-// --- 1. NAVIGATION LOGIC ---
+// --- 1. NAVIGATION FUNCTIONS ---
 
-// Click YES -> Go to Reaction Page
-yesBtn.addEventListener('click', () => {
+// Called by the YES button
+function handleYes() {
     landingPage.classList.remove('active');
     reactionPage.classList.add('active');
-});
+}
 
-// Click NEXT (on Reaction Page) -> Go to Game
-toGameBtn.addEventListener('click', () => {
+// Called by the NEXT button on Reaction Page
+function goToGame() {
     reactionPage.classList.remove('active');
     gamePage.classList.add('active');
     startGame();
-});
+}
 
-// Click NEXT (on Trust Page) -> Go to Poem
-toPoemBtn.addEventListener('click', () => {
+// Called by the NEXT button on Trust Page
+function goToPoem() {
     trustPage.classList.remove('active');
     poemPage.classList.add('active');
     startPoem();
-});
+}
 
-// Click NEXT (after Poem) -> Go to Final Page
-poemNextBtn.addEventListener('click', () => {
+// Called by the NEXT button on Poem Page
+function goToFinal() {
     poemPage.classList.remove('active');
     finalPage.classList.add('active');
     confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-});
+}
 
 
-// --- 2. NO BUTTON CHASE LOGIC (Strict Borders) ---
+// --- 2. NO BUTTON CHASE LOGIC (FAST & BOUNDED) ---
 let isNoBtnMoving = false;
 
 document.addEventListener('mousemove', (e) => {
-    // Only run this logic if we are on the landing page
+    // Only run if on the landing page
     if (!landingPage.classList.contains('active')) return;
 
     const btnRect = noBtn.getBoundingClientRect();
@@ -59,10 +54,9 @@ document.addEventListener('mousemove', (e) => {
 
     const dist = Math.hypot(mouseX - btnCenterX, mouseY - btnCenterY);
 
-    // If mouse is close (within 100px)
-    if (dist < 100) {
+    // TRIGGER DISTANCE: Starts running when mouse is 250px away
+    if (dist < 250) {
         
-        // If this is the first move, switch to fixed positioning so it moves smoothly
         if (!isNoBtnMoving) {
             noBtn.style.position = 'fixed';
             noBtn.style.left = btnRect.left + 'px';
@@ -70,11 +64,11 @@ document.addEventListener('mousemove', (e) => {
             isNoBtnMoving = true;
         }
 
-        // Calculate direction to move AWAY from mouse
         const angle = Math.atan2(mouseY - btnCenterY, mouseX - btnCenterX);
         
-        // Move opposite direction
-        const moveDistance = 50; 
+        // JUMP DISTANCE: 300px
+        const moveDistance = 300; 
+        
         let moveX = Math.cos(angle) * -moveDistance;
         let moveY = Math.sin(angle) * -moveDistance;
 
@@ -82,10 +76,7 @@ document.addEventListener('mousemove', (e) => {
         let newY = btnRect.top + moveY;
 
         // --- BOUNDARY CHECK (Keep on screen) ---
-        // Prevent going off left edge (0) or right edge (window.innerWidth - buttonWidth)
         newX = Math.max(10, Math.min(window.innerWidth - btnRect.width - 10, newX));
-        
-        // Prevent going off top edge (0) or bottom edge
         newY = Math.max(10, Math.min(window.innerHeight - btnRect.height - 10, newY));
 
         noBtn.style.left = `${newX}px`;
@@ -106,29 +97,24 @@ const poopImg = document.getElementById('img-poop');
 const bucketImg = document.getElementById('img-bucket');
 const fireImg = document.getElementById('img-fire');
 
-// Set canvas size
 canvas.width = Math.min(window.innerWidth * 0.9, 400);
 canvas.height = 500;
 
-// Game State
 let gameActive = false;
 let score = 0;
 let animationId;
 let spawnTimeout;
 
-// Entities
 let bucket = { x: canvas.width / 2 - 30, y: canvas.height - 80, width: 60, height: 60 };
 let bossCat = { x: 0, y: 10, width: 70, height: 70, speed: 3, direction: 1 };
 let items = [];
 
-// Bucket Controls
 function moveBucket(e) {
     if (!gameActive) return;
     const rect = canvas.getBoundingClientRect();
     let clientX = e.clientX || e.touches[0].clientX;
     bucket.x = clientX - rect.left - bucket.width / 2;
     
-    // Bounds check
     if (bucket.x < 0) bucket.x = 0;
     if (bucket.x + bucket.width > canvas.width) bucket.x = canvas.width - bucket.width;
 }
@@ -146,15 +132,14 @@ function startGame() {
     spawnItem();
 }
 
-// Make restartGame available globally for the HTML button
-window.restartGame = function() {
+function restartGame() {
     startGame();
 }
 
 function spawnItem() {
     if (!gameActive) return;
 
-    const isFire = Math.random() < 0.2; // 20% Fire
+    const isFire = Math.random() < 0.2; 
 
     items.push({
         type: isFire ? 'fire' : 'poop',
@@ -172,17 +157,17 @@ function animate() {
     if (!gameActive) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 1. Boss Cat
+    // Boss Cat
     bossCat.x += bossCat.speed * bossCat.direction;
     if (bossCat.x + bossCat.width > canvas.width || bossCat.x < 0) {
         bossCat.direction *= -1;
     }
     ctx.drawImage(catImg, bossCat.x, bossCat.y, bossCat.width, bossCat.height);
 
-    // 2. Bucket
+    // Bucket
     ctx.drawImage(bucketImg, bucket.x, bucket.y, bucket.width, bucket.height);
 
-    // 3. Items
+    // Items
     for (let i = 0; i < items.length; i++) {
         let item = items[i];
         item.y += item.speed;
@@ -190,14 +175,13 @@ function animate() {
         let img = item.type === 'fire' ? fireImg : poopImg;
         ctx.drawImage(img, item.x, item.y, item.width, item.height);
 
-        // Collision Check
+        // Collision
         if (
             item.x < bucket.x + bucket.width &&
             item.x + item.width > bucket.x &&
             item.y < bucket.y + bucket.height &&
             item.y + item.height > bucket.y
         ) {
-            // CAUGHT
             if (item.type === 'fire') {
                 gameOver();
                 return;
@@ -213,13 +197,11 @@ function animate() {
                 }
             }
         } 
-        // Missed (Floor)
         else if (item.y > canvas.height) {
             items.splice(i, 1);
             i--;
         }
     }
-
     animationId = requestAnimationFrame(animate);
 }
 
@@ -234,7 +216,6 @@ function gameWin() {
     gameActive = false;
     clearTimeout(spawnTimeout);
     cancelAnimationFrame(animationId);
-    
     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
     setTimeout(() => {

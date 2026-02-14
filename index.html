@@ -20,7 +20,7 @@
         </div>
         <h1>Will you be my Valentine?</h1>
         <div class="buttons">
-            <button id="yes-btn">Yes!</button>
+            <button id="yes-btn" onclick="handleYes()">Yes!</button>
             <button id="no-btn">No</button>
         </div>
     </div>
@@ -31,7 +31,7 @@
         </div>
         <h2>I knew you would say Yes! ❤️</h2>
         <p>KiKi has got something for you...</p>
-        <button class="nav-btn" id="to-game-btn">Next</button>
+        <button class="nav-btn" onclick="goToGame()">Next</button>
     </div>
 
     <div id="game-page" class="screen">
@@ -43,7 +43,7 @@
             <canvas id="gameCanvas"></canvas>
             
             <div id="game-over-screen" class="overlay hidden">
-                <h2>Oh no! You caught fire! 🔥</h2>
+                <h2>Bruh! You want kaboom meh! 🔥</h2>
                 <button onclick="restartGame()">Try Again</button>
             </div>
         </div>
@@ -54,7 +54,7 @@
             <img src="kiki.jpg" alt="KiKi" class="main-photo">
         </div>
         <h1 class="floating-text">KiKi trusts you now! 🐾</h1>
-        <button class="nav-btn" id="to-poem-btn">Next</button>
+        <button class="nav-btn" onclick="goToPoem()">Next</button>
     </div>
 
     <div id="poem-page" class="screen">
@@ -62,7 +62,7 @@
             <img src="photo2.jpg" alt="Us Again" class="main-photo fade-in-photo">
         </div>
         <div id="poem-container"></div>
-        <button id="poem-next-btn" class="nav-btn hidden">Next</button>
+        <button id="poem-next-btn" class="nav-btn hidden" onclick="goToFinal()">Next</button>
     </div>
 
     <div id="final-page" class="screen">
