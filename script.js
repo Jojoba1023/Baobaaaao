@@ -24,6 +24,7 @@ function goToGame() {
 function goToPoem() {
     trustPage.classList.remove('active');
     poemPage.classList.add('active');
+    window.scrollTo(0, 0); // Force scroll to top
     startPoem();
 }
 
@@ -49,9 +50,7 @@ document.addEventListener('mousemove', (e) => {
 
     const dist = Math.hypot(mouseX - btnCenterX, mouseY - btnCenterY);
 
-    // REVERTED: Detection radius back to 100px (closer)
     if (dist < 100) {
-        
         if (!isNoBtnMoving) {
             noBtn.style.position = 'fixed';
             noBtn.style.left = btnRect.left + 'px';
@@ -60,8 +59,6 @@ document.addEventListener('mousemove', (e) => {
         }
 
         const angle = Math.atan2(mouseY - btnCenterY, mouseX - btnCenterX);
-        
-        // REVERTED: Speed back to 50px (smooth chase)
         const moveDistance = 50; 
         
         let moveX = Math.cos(angle) * -moveDistance;
@@ -70,7 +67,6 @@ document.addEventListener('mousemove', (e) => {
         let newX = btnRect.left + moveX;
         let newY = btnRect.top + moveY;
 
-        // Boundary Check
         newX = Math.max(10, Math.min(window.innerWidth - btnRect.width - 10, newX));
         newY = Math.max(10, Math.min(window.innerHeight - btnRect.height - 10, newY));
 
@@ -86,7 +82,6 @@ const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const gameOverScreen = document.getElementById('game-over-screen');
 
-// Images
 const catImg = document.getElementById('img-cat');
 const poopImg = document.getElementById('img-poop');
 const bucketImg = document.getElementById('img-bucket');
@@ -122,7 +117,6 @@ function startGame() {
     scoreEl.innerText = score;
     gameActive = true;
     gameOverScreen.classList.add('hidden'); 
-    
     animate();
     spawnItem();
 }
@@ -134,7 +128,8 @@ function restartGame() {
 function spawnItem() {
     if (!gameActive) return;
 
-    const isFire = Math.random() < 0.2; 
+    // CHANGED: Increased fire chance to 45% (0.45)
+    const isFire = Math.random() < 0.45; 
 
     items.push({
         type: isFire ? 'fire' : 'poop',
@@ -152,17 +147,13 @@ function animate() {
     if (!gameActive) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Boss Cat
     bossCat.x += bossCat.speed * bossCat.direction;
     if (bossCat.x + bossCat.width > canvas.width || bossCat.x < 0) {
         bossCat.direction *= -1;
     }
     ctx.drawImage(catImg, bossCat.x, bossCat.y, bossCat.width, bossCat.height);
-
-    // Bucket
     ctx.drawImage(bucketImg, bucket.x, bucket.y, bucket.width, bucket.height);
 
-    // Items
     for (let i = 0; i < items.length; i++) {
         let item = items[i];
         item.y += item.speed;
@@ -170,7 +161,6 @@ function animate() {
         let img = item.type === 'fire' ? fireImg : poopImg;
         ctx.drawImage(img, item.x, item.y, item.width, item.height);
 
-        // Collision
         if (
             item.x < bucket.x + bucket.width &&
             item.x + item.width > bucket.x &&
@@ -185,7 +175,6 @@ function animate() {
                 scoreEl.innerText = score;
                 items.splice(i, 1);
                 i--;
-                
                 if (score >= 15) {
                     gameWin();
                     return;
@@ -212,7 +201,6 @@ function gameWin() {
     clearTimeout(spawnTimeout);
     cancelAnimationFrame(animationId);
     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
     setTimeout(() => {
         gamePage.classList.remove('active');
         trustPage.classList.add('active');
@@ -280,14 +268,11 @@ function startPoem() {
 
         setTimeout(() => {
             p.classList.add('visible');
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }, delay);
         delay += 1000; 
     });
 
     setTimeout(() => {
         poemNextBtn.classList.remove('hidden');
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, delay + 500);
 }
-

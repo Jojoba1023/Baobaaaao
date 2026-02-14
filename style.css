@@ -125,3 +125,17 @@ canvas {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-15px); }
 }
+
+/* --- FIX FOR POEM PAGE --- */
+/* This ensures the poem starts at the top and doesn't get cut off */
+#poem-page {
+    justify-content: flex-start !important; 
+    padding-top: 50px;
+    height: auto !important; 
+    min-height: 100vh;
+    overflow-y: auto !important;
+}
+
+#poem-container {
+    padding-bottom: 100px; /* Extra space at bottom for the button */
+}
