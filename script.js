@@ -35,7 +35,7 @@ function goToFinal() {
 }
 
 
-// --- 2. NO BUTTON CHASE LOGIC (NORMAL SPEED) ---
+// --- 2. NO BUTTON CHASE LOGIC ---
 let isNoBtnMoving = false;
 
 document.addEventListener('mousemove', (e) => {
@@ -128,7 +128,7 @@ function restartGame() {
 function spawnItem() {
     if (!gameActive) return;
 
-    // CHANGED: Increased fire chance to 45% (0.45)
+    // 45% Chance for Fire
     const isFire = Math.random() < 0.45; 
 
     items.push({
@@ -208,7 +208,7 @@ function gameWin() {
 }
 
 
-// --- 4. POEM LOGIC ---
+// --- 4. POEM LOGIC (BUTTON FIX) ---
 const poemText = [
     "笑我那些爛笑話的樣子",
     "笑到彎腰 笑到流淚",
@@ -242,7 +242,7 @@ const poemText = [
     "用我的爛笑話 我的笨動作",
     "以愛情的姿勢，深入妳的幽谷",
     "山峰聳立起來，再一次彎腰，再一次流淚",
-    "Anyway….",
+    "Anyway…",
     "我偶爾會傻逼的樣子（故意的啦）",
     "讓你成為全世界最開心的女生",
     "就算你笑的是我",
@@ -269,10 +269,11 @@ function startPoem() {
         setTimeout(() => {
             p.classList.add('visible');
         }, delay);
-        delay += 1000; 
+        delay += 800; // Slightly faster text speed (0.8s)
     });
 
+    // FIX: Show the button after 2 seconds, don't wait for the poem!
     setTimeout(() => {
         poemNextBtn.classList.remove('hidden');
-    }, delay + 500);
+    }, 2000);
 }
